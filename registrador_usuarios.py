@@ -1,3 +1,15 @@
+
+if __name__ == "__main__":
+    from app.database import initialize_database
+    from app.ui import GestorEstoqueApp
+
+    initialize_database()
+    GestorEstoqueApp().mainloop()
+    raise SystemExit
+
+
+# Implementação anterior preservada abaixo como referência temporária.
+# Ela não é executada quando este arquivo é aberto diretamente.
 import sqlite3
 import tkinter as tk
 from tkinter import ttk
@@ -72,7 +84,7 @@ def esconder_overlay(nome):
     overlays[nome].place_forget()
     
 
-
+#==========================================================================================================================================
 
 
 #leitor de codigo de barras
@@ -312,55 +324,7 @@ def cria_overlay_controle_estoque():
         except sqlite3.IntegrityError:
             label_status_atualizar.config(text="email ja cadastrado")
 
-    def entrada_saida():
-        janela_entradasaida =ctk.CTkToplevel(janela)
-        janela_entradasaida.title("ENTRADA/SAIDA")
-        janela_entradasaida.geometry("600x600")
 
-        text = ctk.CTkLabel(janela_entradasaida, text="Digite o ID do produto")
-        text.pack()
-
-        ctk.CTkLabel(janela_entradasaida, text="ID").pack()
-        entry_id_entradasaida = ctk.CTkEntry(janela_entradasaida)
-        entry_id_entradasaida.pack()
-
-        label_status_entradasaida = ctk.CTkLabel(janela_entradasaida, text="")
-        label_status_entradasaida.pack()
-
-        def buscar_produto_entradasaida():
-            try:
-                produto_selecionado = int(entry_id_entradasaida.get())
-            except ValueError:
-                label_status_entradasaida.configure(text="Digite apenas numeros")
-                return
- 
-            
-            cursor.execute("SELECT quantidade FROM produtos WHERE id = ?", (produto_selecionado,))
-            resultado_produto = cursor.fetchone()
- 
-            if resultado_produto is None:
-                label_status_entradasaida.configure(text="esse id nao existe | ou não foi cadastrado")
-                id_confirmar["valor"] = None
-                return
- 
-           
-            quantidade = resultado_produto[0]
-            entry_novo_quantidade.delete(0, tk.END)
-            entry_novo_quantidade.insert(0, quantidade)
- 
-            id_confirmar["valor"] = produto_selecionado
-            label_status_atualizar.configure(text="produto encontrado atualize os campos")
-            janela_entradasaida.destroy()
- 
-        
-     
-        
-        
-        
-        
-
-        ctk.CTkButton(janela_entradasaida, text="BUSCAR",corner_radius=10, height=40, fg_color="#2b2b2b", font=("Arial", 14 , "bold"), command=buscar_produto_entradasaida).pack(pady=10)
-    ctk.CTkButton(frame, text="ENTRADA/SAIDA",corner_radius=10, height=40, fg_color="#2b2b2b", font=("Arial", 14 , "bold"), anchor="w", image=icone_search, command=entrada_saida).pack(pady=5)
     ctk.CTkButton(frame, text="BUSCAR ID",corner_radius=10, height=40, fg_color="#2b2b2b", font=("Arial", 14 , "bold"), anchor="w", image=icone_search, command=confirmar_id).pack(pady=5)       
     ctk.CTkButton(frame, text="SALVAR ALTERAÇÃO",corner_radius=10, height=40, fg_color="#2b2b2b", font=("Arial", 14 , "bold"), image=icone_upload, anchor="w", command=salvar_alteracoes).pack(pady=5)
     ctk.CTkButton(frame, text="SAIR",corner_radius=10, height=40, fg_color="#2b2b2b", font=("Arial", 14 , "bold"), anchor="w", image=icone_sair, command=lambda: esconder_overlay("controle estoque")).pack(pady=5)  
