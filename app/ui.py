@@ -1,8 +1,16 @@
+import sys
 import tkinter as tk
+from pathlib import Path
 from tkinter import messagebox, ttk
 import customtkinter as ctk
 
-from . import repositories, services
+# Permite executar tanto pelo arquivo principal quanto pelo botão "Run Python
+# File" da IDE sobre este arquivo.
+if __package__ in (None, ""):
+    sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+    from app import repositories, services
+else:
+    from . import repositories, services
 
 
 PRIMARY = "#1d4ed8"
@@ -186,3 +194,10 @@ class InvoiceWindow(ctk.CTkToplevel):
             messagebox.showinfo("Entrada registrada", f"Nota gravada com sucesso. Total: R$ {total:,.2f}", parent=self); self.on_saved(); self.destroy()
         except ValueError as error: messagebox.showwarning("Revise a nota", str(error), parent=self)
         except Exception as error: messagebox.showerror("Erro ao salvar", str(error), parent=self)
+
+
+if __name__ == "__main__":
+    from app.database import initialize_database
+
+    initialize_database()
+    GestorEstoqueApp().mainloop()
