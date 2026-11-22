@@ -1,3 +1,5 @@
+"""Inicializa o sistema de gestão de estoque."""
+
 from app.database import initialize_database
 from app.ui import GestorEstoqueApp
 

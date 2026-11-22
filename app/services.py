@@ -4,19 +4,25 @@ from .database import connect
 
 
 def register_incoming_invoice(numero, serie, fornecedor_id, items):
-    """Grava a nota, seus itens e o aumento de saldo em uma única transação."""
-    if not numero.strip() or not items:
+    """Grava nota, itens, saldo e movimentações em uma única transação."""
+    numero = (numero or "").strip()
+    if not numero or not items:
         raise ValueError("Informe o número da nota e pelo menos um item.")
     if not fornecedor_id:
         raise ValueError("Selecione um fornecedor.")
 
+    for item in items:
+        if item["quantidade"] <= 0 or item["preco"] < 0:
+            raise ValueError("A quantidade deve ser positiva e o preço não pode ser negativo.")
+
     total = sum(item["quantidade"] * item["preco"] for item in items)
+    today = date.today().isoformat()
     with connect() as connection:
         cursor = connection.execute(
             """INSERT INTO notas_fiscais
                (numero, serie, fornecedor_id, emissao, total)
                VALUES (?, ?, ?, ?, ?)""",
-            (numero, serie, fornecedor_id, date.today().isoformat(), total),
+            (numero, serie, fornecedor_id, today, total),
         )
         nota_id = cursor.lastrowid
         for item in items:
@@ -34,6 +40,6 @@ def register_incoming_invoice(numero, serie, fornecedor_id, items):
                 """INSERT INTO movimentacoes_estoque
                    (produto_id, tipo, quantidade, data, referencia)
                    VALUES (?, 'Entrada NF', ?, ?, ?)""",
-                (item["produto_id"], item["quantidade"], date.today().isoformat(), f"NF {numero}"),
+                (item["produto_id"], item["quantidade"], today, f"NF {numero}"),
             )
     return total
